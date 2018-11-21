@@ -1,0 +1,13 @@
+1. 调用函数加不加()的区别及原理
+2. 查看Python代码规范来修改代码
+3. 看flask request库
+4. 看flask sqlalchemy库
+5. 看time的datatime，data库
+6. 了解时间戳
+7. 去看sqlachl的查询模块，各种与sql语句有关的功能
+8. sqlalchemy库 外键问题
+
+0.访文件到服务器上
+1.flask 跨域
+2.wsgi 
+3.samba 配置
