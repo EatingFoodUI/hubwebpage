@@ -11,3 +11,5 @@
 1.flask 跨域
 2.wsgi 
 3.samba 配置
+
+配置github
