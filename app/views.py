@@ -11,6 +11,8 @@ from flask import Response, json
 # 登录板块（json）
 @app.route('/checklogin', methods=['GET', 'POST'])
 def login():
+    import pdb
+    pdb.set_trace()
     if request.method == 'GET':
         # 测试
         response = jsonify({'username': 'liyonglin', 'password': '123456'})
@@ -25,12 +27,13 @@ def login():
         if now_user is None:
             static = 0
             return jsonify({'static': static})
-        elif now_user.password != now_password:
+        elif now_user.password != now_password:   # now_user.password是数字
             static = 1
             return jsonify({'static': static})
         elif now_user.password == now_password:
             static = 2
             # 记录登录状态
+            # 修改:session保质期的设置
             session['username'] = request.json['username']
             return jsonify({'static': static})
 
@@ -149,15 +152,15 @@ def add_project():
         return '200'
     if request.method == 'POST':
         projectName = request.json['projectName']
-        projectMan = request.json['projectMan']
+        projectMan = request.json['projectMan'] # 修改为项目简介
         time = request.json['time']
 
         # 查询是否已添加过项目(商议是否修改原项目)
         ishas_project = Project.query.filter(Project.projectName == projectName).first()
         if ishas_project is None:
             project = Project(projectName=projectName, projectMan=projectMan, time=time)
-            db.seesion.add(project)
-            db.seesion.commit()
+            db.session.add(project)
+            db.session.commit()
             project_id = project.projectNo
             static = 1
             return jsonify({'Projectid': project_id, 'static': static})

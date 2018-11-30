@@ -12,6 +12,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     account = db.Column(db.Integer, unique=True)
     username = db.Column(db.String(20), unique=True)
+    # 问题:使用falsk migrate等导入数据库的定义与实际不符
     password = db.Column(db.String(20))
     # 用户权限的问题
     authority = db.Column(db.String(4))
@@ -147,6 +148,7 @@ class Essay(db.Model):
 
 
 # 实验室项目
+# 有字符集问题
 class Project(db.Model):
     __tablename__ = 'Project'
     # 项目id
@@ -157,7 +159,8 @@ class Project(db.Model):
     projectMan = db.Column(db.String(10))
     # 阅览人数
     howmany = db.Column(db.Integer, default=0)
-    # 项目时间 2018-7-26
+    # 项目时间 2018-7-26 
+    # 修改datatime
     time = db.Column(db.Date, default=datetime.date.today())
 
     # 项目主页转json使用
