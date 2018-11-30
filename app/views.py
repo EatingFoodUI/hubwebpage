@@ -62,9 +62,9 @@ def login():
 @app.route('/getProject')
 def ProjectPage():
     # 项目名称，项目负责人，项目时间，具体页面
-    name = request.args.get('name')
-    man = request.args.get('man')
-    time = request.args.get('time')
+    name = request.args.get('name').strip('\'')
+    man = request.args.get('man').strip('\'')
+    time = request.args.get('time').strip('\'')
     page = request.args.get('page')
 
     # 每页8个
@@ -73,7 +73,7 @@ def ProjectPage():
     if time == '一个月之前':
         time = Now_time + datetime.timedelta(days=-30)
         # 将来可能需要修改，此处只改到10年前
-        time2 = Now_time + datetime.date.timedelta(years=-10)
+        time2 = Now_time + datetime.timedelta(years=-10)
         project = Project.query.order_by(Project.time.asc()).filter(and_(Project.time.between(time2, time), Project.projectName==name, Project.projectMan==man)).all()
         all_page = len(project)
         # project = Project.query.filter(and_(Project.time.between(time2, time), projectName==name, projectMan==man).order_by(Project.projectNo.asc()).paginate(page=page, per_page=8, error_out=False)).all()
