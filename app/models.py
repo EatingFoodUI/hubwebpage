@@ -91,16 +91,19 @@ class ProjectEssay(db.Model):
     pro_type = db.Column(db.String(10))
     # 项目id（外键）
     projectNo = db.Column(db.Integer, db.ForeignKey('Project.projectNo'))
-    
+    # 文章简介
+    pro_EssayTit = db.Column(db.String(20))
+
     Project = db.relationship('Project', backref=db.backref('ProjectEsssay'))
 
     # 项目页显示文章
     def proEssay_to_json(self):
         json_proEssay = {
-            'title': self.title,
-            'content': self.content,
-            'id': (1, self.essayNo),
-            'type': self.pro_type
+            'title': self.pro_title,
+            'content': self.pro_content,
+            'id': self.pro_essayNo,
+            'type': self.pro_type,
+            'EssayTit': self.pro_EssayTit
         }
         return json_proEssay
 
@@ -110,7 +113,8 @@ class ProjectEssay(db.Model):
             'type': self.pro_type,
             'id': self.pro_essayNo,
             'title': self.pro_title,
-            'content': self.pro_content
+            'content': self.pro_content,
+            'EssayTit': self.pro_EssayTit
         }
         return json_proEssay
 

@@ -63,7 +63,7 @@ def login():
 def ProjectPage():
     # 项目名称，项目负责人，项目时间，具体页面
     name = request.args.get('name').strip('\'')
-    # man = request.args.get('projectTit').strip('\'')  
+    # man = request.args.get('projectTit').strip('\'')
     time = request.args.get('time').strip('\'')
     page = request.args.get('page')
 
@@ -73,14 +73,17 @@ def ProjectPage():
     # import pdb
     # pdb.set_trace()
     if time == '一个月之前':
-        time = Now_time + datetime.timedelta(days=-30)        # 将来可能需要修改，此处只改到10年前
+        # 将来可能需要修改，此处只改到10年前
+        time = Now_time + datetime.timedelta(days=-30)
         time2 = Now_time + datetime.timedelta(days=-3650)
-        project = Project.query.order_by(Project.time.asc()).filter(and_(Project.time.between(time2, time), Project.projectName.like('%'+name))).all()
+        project = Project.query.order_by(Project.time.asc()).filter(and_(
+            Project.time.between(time2, time), Project.projectName.like('%'+name))).all()
         allpage = len(project)
         turn_to_json = []
         for i in range(0, 8):
             try:
-                one_json = project[8*(int(page)-1)+i].ProjectPage_need_to_json()
+                one_json = project[8*(int(page)-1) +
+                                   i].ProjectPage_need_to_json()
                 turn_to_json.append(one_json)
             except Exception:
                 print('')
@@ -94,13 +97,14 @@ def ProjectPage():
         time = Now_time + datetime.timedelta(days=-7)
     elif time == '一个月内':
         time = Now_time + datetime.timedelta(days=-30)
-    project = Project.query.order_by(Project.time.asc()).filter(and_(Project.time.between(time, Now_time), Project.projectName.like('%'+name))).all()
+    project = Project.query.order_by(Project.time.asc()).filter(and_(
+        Project.time.between(time, Now_time), Project.projectName.like('%'+name))).all()
     all_page = len(project)
     turn_to_json = []
 
     # for i in project:
-       # one_json = project[i].ProjectPage_need_to_json()
-       # turn_to_json.append(one_json)
+    # one_json = project[i].ProjectPage_need_to_json()
+    # turn_to_json.append(one_json)
     # import pdb
     # pdb.set_trace()
     for i in range(0, 8):
@@ -136,6 +140,8 @@ def show_project_essay():
             eachType_sum = len(essay_all)
             for j in range(len(eachType_sum)):
                 essay_json = essay_all[j].proEssay_to_json
+                import pdb
+                pdb.set_trace()
                 list_all[i].append(essay_json)
     return jsonify({'design': list_1, 'keyissue': list_2, 'point': list_3, 'process': list_4})
 
@@ -147,13 +153,15 @@ def add_project():
         return '200'
     if request.method == 'POST':
         projectName = request.json['projectName']
-        projectMan = request.json['projectMan'] 
+        projectMan = request.json['projectMan']
         time = request.json['time']
 
         # 查询是否已添加过项目(商议是否修改原项目)
-        ishas_project = Project.query.filter(Project.projectName == projectName).first()
+        ishas_project = Project.query.filter(
+            Project.projectName == projectName).first()
         if ishas_project is None:
-            project = Project(projectName=projectName, projectMan=projectMan, time=time)
+            project = Project(projectName=projectName,
+                              projectMan=projectMan, time=time)
             db.session.add(project)
             db.session.commit()
             project_id = project.projectNo
@@ -164,7 +172,7 @@ def add_project():
             return jsonify({'static': static})
 
 
-# 添加/编辑项目文章页
+# 编辑项目文章页
 @app.route('/getProjectPage', methods=['GET', 'POST'])
 def edit_Proessay():
     if request.method == 'GET':
@@ -172,8 +180,10 @@ def edit_Proessay():
         # Projectid = request.args.get('ProjectId')
         # pro_essay_type = request.args.get('type')
         pro_essay_id = request.args.get('id')
-        pro_essay = ProjectEssay.query.filter(ProjectEssay.pro_essayNo == pro_essay_id).first()
-        return pro_essay.edit_proEssay_to_json()
+        pro_essay = ProjectEssay.query.filter(
+            ProjectEssay.pro_essayNo == pro_essay_id).first()
+        a = pro_essay.edit_proEssay_to_json() # 222222222222222222
+        return jsonify(a)
     # 获得编辑后文章
     elif request.method == 'POST':
         pro_type = request.json.get['type']
@@ -181,16 +191,21 @@ def edit_Proessay():
         pro_title = request.json.get['title']
         pro_content = request.json.get['content']
         pro_time = request.json.get['time']
+        pro_EssayTit = request.json.get['pageTit']
 
         # 修改编辑后的文章数据入数据库
-        pro_essay = ProjectEssay.query.filter(ProjectEssay.pro_essayNo == pro_id).first()
+        pro_essay = ProjectEssay.query.filter(
+            ProjectEssay.pro_essayNo == pro_id).first()
         pro_essay.pro_type = pro_type
         pro_essay.pro_title = pro_title
         pro_essay.pro_content = pro_content
         pro_essay.pro_content = pro_time
+        pro_essay.pro_EssayTit = pro_EssayTit
         db.session.commit()
         # 商议：返回一个参数使得判断成功
-        return 0
+        static = 0
+        return jsonify({'static': static})
+
 
 
 # 添加项目文章
@@ -207,8 +222,8 @@ def addPro_essay():
         Pro_title = request.json.get['title']
         Pro_content = request.json.get['content']
         Pro_time = request.json.get['time']
-        new_essay = ProjectEssay(ProjectEssay.pro_title == Pro_title, ProjectEssay.pro_content == Pro_content,
-                                 ProjectEssay.pro_updateTime == Pro_time, ProjectEssay.pro_type == Pro_type, ProjectEssay.projectNo == Projectid)
+        new_essay = ProjectEssay(pro_title=Pro_title, pro_content=Pro_content, pro_updateTime=Pro_time,
+                                 pro_type=Pro_type, projectNo=Projectid)
         db.session.add(new_essay)
         db.session.commit()
         if new_essay.pro_essayNo > 0:
@@ -227,18 +242,19 @@ def show_essay():
 
     # 获取文章，json化，传到前端
     # essay_sum = Essay.query.filter(and_(title=title, author=author, time=time)
-                                  # .order_by(Essay.time.asc()).paginate(page=page, per_page=8, error_out=False)).all()
-    essay_sum = Essay.query.order_by(Essay.updatetime.asc()).filter(and_(Essay.title == title, Essay.author == author, Essay.updatetime == time)).all()
+    # .order_by(Essay.time.asc()).paginate(page=page, per_page=8, error_out=False)).all()
+    essay_sum = Essay.query.order_by(Essay.updatetime.asc()).filter(and_(
+        Essay.title == title, Essay.author == author, Essay.updatetime == time)).all()
     # essay_for_page = Project.query.filter(
-      #  and_(title=title, author=author, time=time).all())
+    #  and_(title=title, author=author, time=time).all())
     total_page = len(essay_sum)/8
     turn_to_json = []
     for i in range(0, 8):
-            try:
-                one_json = essay_sum[8*(int(page)-1)+i].ShowEssay_to_json()
-                turn_to_json.append(one_json)
-            except Exception:
-                print('')
+        try:
+            one_json = essay_sum[8*(int(page)-1)+i].ShowEssay_to_json()
+            turn_to_json.append(one_json)
+        except Exception:
+            print('')
     # for i in range(len(essay_sum)):
         # one_json = essay_sum[i].ShowEssay_to_json()
         # turn_to_json.append(one_json)
@@ -280,18 +296,19 @@ def show_hubMember():
     direction = request.args.get('direction')
     page = request.args.get('page')
     # hubMember = Member.query.filter(and_(memberName=name, academy=college, direction=direction)
-                                   # .order_by(Member.memberNo.asc()).paginate(page=page, per_page=8, error_out=False)).all()
+    # .order_by(Member.memberNo.asc()).paginate(page=page, per_page=8, error_out=False)).all()
     # Member_for_count = Member.query.filter(
-       # and_(memberName=name, academy=college, direction=direction)).all()
-    hubMember = Member.query.filter(and_(Member.memberName == name, Member.academy == college, Member.direction == direction)).order_by(Member.memberNo.asc()).all()
+    # and_(memberName=name, academy=college, direction=direction)).all()
+    hubMember = Member.query.filter(and_(Member.memberName == name, Member.academy ==
+                                         college, Member.direction == direction)).order_by(Member.memberNo.asc()).all()
     total_page = len(hubMember)/8
     turn_to_json = []
     for i in range(0, 8):
-            try:
-                one_json = hubMember[8*(int(page)-1)+i].show_all_member_to_json()
-                turn_to_json.append(one_json)
-            except Exception:
-                print('')
+        try:
+            one_json = hubMember[8*(int(page)-1)+i].show_all_member_to_json()
+            turn_to_json.append(one_json)
+        except Exception:
+            print('')
     return jsonify({'total': total_page, 'member': turn_to_json})
 
 
