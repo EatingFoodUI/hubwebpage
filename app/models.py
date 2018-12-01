@@ -169,7 +169,7 @@ class Project(db.Model):
             'projectName': self.projectName,
             'projectMan': self.projectMan,
             'howmany': self.howmany,
-            'time': self.time,
+            'time': str(self.time),
             'Projectid': self.projectNo
         }
         return json_project

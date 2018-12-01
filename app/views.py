@@ -63,24 +63,20 @@ def login():
 def ProjectPage():
     # 项目名称，项目负责人，项目时间，具体页面
     name = request.args.get('name').strip('\'')
-    man = request.args.get('man').strip('\'')
+    # man = request.args.get('projectTit').strip('\'')  
     time = request.args.get('time').strip('\'')
     page = request.args.get('page')
 
     # 每页8个
     # 查询，限制页数，限制时间，以时间排序
     Now_time = datetime.date.today()
+    # import pdb
+    # pdb.set_trace()
     if time == '一个月之前':
-        time = Now_time + datetime.timedelta(days=-30)
-        # 将来可能需要修改，此处只改到10年前
-        time2 = Now_time + datetime.timedelta(years=-10)
-        project = Project.query.order_by(Project.time.asc()).filter(and_(Project.time.between(time2, time), Project.projectName==name, Project.projectMan==man)).all()
-        all_page = len(project)
-        # project = Project.query.filter(and_(Project.time.between(time2, time), projectName==name, projectMan==man).order_by(Project.projectNo.asc()).paginate(page=page, per_page=8, error_out=False)).all()
-        # project_for_page = Project.query.filter(
-            # and_(Project.time.between(time2, time), projectName=name, projectMan=man).all())
-        # 计算分页的总数
-        # total_page = len(project_for_page)/8
+        time = Now_time + datetime.timedelta(days=-30)        # 将来可能需要修改，此处只改到10年前
+        time2 = Now_time + datetime.timedelta(days=-3650)
+        project = Project.query.order_by(Project.time.asc()).filter(and_(Project.time.between(time2, time), Project.projectName.like('%'+name))).all()
+        allpage = len(project)
         turn_to_json = []
         for i in range(0, 8):
             try:
@@ -88,7 +84,7 @@ def ProjectPage():
                 turn_to_json.append(one_json)
             except Exception:
                 print('')
-        return jsonify({'list': turn_to_json, 'total': all_page})
+        return jsonify({'list': turn_to_json, 'total': allpage})
     # 考虑修改
     elif time == '昨天':
         time = Now_time + datetime.timedelta(days=-1)
@@ -98,16 +94,15 @@ def ProjectPage():
         time = Now_time + datetime.timedelta(days=-7)
     elif time == '一个月内':
         time = Now_time + datetime.timedelta(days=-30)
-    project = Project.query.order_by(Project.time.asc()).filter(and_(Project.time.between(time, Now_time), Project.projectName==name, Project.projectMan==man)).all()
-    # project = Project.query.order_by(Project.time.asc()).paginate(page=int(page), per_page=8, error_out=False)
-    # project_for_page = Project.query.filter(and_(Project.time.between(time, Now_time), Project.projectName==name, Project.projectMan==man)).all()
-    # total_page = len(project_for_page)/8
+    project = Project.query.order_by(Project.time.asc()).filter(and_(Project.time.between(time, Now_time), Project.projectName.like('%'+name))).all()
     all_page = len(project)
     turn_to_json = []
+
     # for i in project:
        # one_json = project[i].ProjectPage_need_to_json()
        # turn_to_json.append(one_json)
-
+    # import pdb
+    # pdb.set_trace()
     for i in range(0, 8):
         try:
             one_json = project[8*(int(page)-1)+i].ProjectPage_need_to_json()
@@ -152,7 +147,7 @@ def add_project():
         return '200'
     if request.method == 'POST':
         projectName = request.json['projectName']
-        projectMan = request.json['projectMan'] # 修改为项目简介
+        projectMan = request.json['projectMan'] 
         time = request.json['time']
 
         # 查询是否已添加过项目(商议是否修改原项目)
